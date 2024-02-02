@@ -86,15 +86,13 @@ class DBStorage:
         Returns:
             The object based on the class and its ID, or None if not found
         """
-        new_obj = {}
         for clss in classes:
             if cls is classes[clss] or cls is clss:
                 obj = self.__session.query(
                     classes[clss]
                     ).filter_by(id=id).first()
-                key = obj.__class__.__name__ + '.' + obj.id
-                new_obj[key] = obj
                 return(obj)
+        return None
 
     def count(self, cls=None):
         """
