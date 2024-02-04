@@ -63,6 +63,7 @@ class DBStorage:
         """delete from the current database session obj if not None"""
         if obj is not None:
             self.__session.delete(obj)
+            self.save()
 
     def reload(self):
         """reloads data from the database"""
@@ -82,7 +83,7 @@ class DBStorage:
         Args:
             cls (object): Class
             id (str): String representing the object ID
-            
+
         Returns:
             The object based on the class and its ID, or None if not found
         """
@@ -91,7 +92,7 @@ class DBStorage:
                 obj = self.__session.query(
                     classes[clss]
                     ).filter_by(id=id).first()
-                return(obj)
+                return (obj)
         return None
 
     def count(self, cls=None):
