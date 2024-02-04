@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # api/v1/views/cities.py
-"""Handles all default RESTFul API actions for States"""
+"""Handles all default RESTFul API actions for Cities"""
 from flask import jsonify, abort, request
 from models.state import State
 from models.city import City
