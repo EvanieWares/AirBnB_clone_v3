@@ -58,12 +58,13 @@ def delete_place_amenity(place_id, amenity_id):
     if place is None or amenity is None:
         abort(404)
     if STORAGE_TYPE == 'db':
-        place_amenities = place.amenities
+        if amenity not in place.amenities:
+            abort(404)
+        place.amenities.remove(amenity)
     else:
-        place_amenities = place.amenity_ids
-    if amenity not in place_amenities:
-        abort(404)
-    place_amenities.remove(amenity)
+        if amenity_id in place.amenity_ids:
+            abort(404)
+        place.amenity_ids.remove(amenity_id)
     place.save()
     return jsonify({}), 200
 
