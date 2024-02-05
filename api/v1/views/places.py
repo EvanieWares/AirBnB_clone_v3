@@ -7,6 +7,8 @@ from models.place import Place
 from models.user import User
 from models import storage
 from api.v1.views import app_views
+from os import getenv
+STORAGE_TYPE = getenv('HBNB_TYPE_STORAGE', "fs")
 
 
 @app_views.route(
@@ -112,3 +114,41 @@ def update_place(place_id):
             setattr(place, key, value)
     place.save()
     return jsonify(place.to_dict()), 200
+
+
+@app_views.route('/places_search', methods=['POST'], strict_slashes=False)
+def places_search():
+    """
+    Retrieves all Place objects depending on the JSON in the body of the request
+    """
+    req_json = request.get_json()
+    
+    if req_json is None:
+        abort(400, 'Not a JSON')
+    
+    states = set(req_json.get('states', []))
+    cities = set(req_json.get('cities', []))
+    amenities = set(req_json.get('amenities', []))
+    
+    if not (states or cities or amenities):
+        all_places = [place.to_json() for place in storage.all('Place').values()]
+        return jsonify(all_places)
+
+    filtered_places = set()
+
+    if states:
+        all_cities = storage.all('City')
+        state_cities = {city.id for city in all_cities.values() if city.state_id in states}
+        filtered_places.update({place for place in storage.all('Place').values() if place.city_id in state_cities})
+
+    if cities:
+        filtered_places.update({storage.get('City', c_id).places for c_id in cities if storage.get('City', c_id)})
+
+    if amenities:
+        filtered_places = {
+            place for place in filtered_places if
+            amenities.issubset({amenity.id for amenity in place.amenities}) if place.amenities
+        }
+
+    result = [place.to_json() for place in filtered_places]
+    return jsonify(result)
