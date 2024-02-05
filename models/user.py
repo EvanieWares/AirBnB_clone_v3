@@ -27,15 +27,7 @@ class User(BaseModel, Base):
 
     def __init__(self, *args, **kwargs):
         """initializes user"""
-        if kwargs:
-            password = kwargs.pop('password', None)
-            if password is not None:
-                User.__set_password(password)
+        password = kwargs.pop("password", None)
+        if password is not None:
+            self.password = hashlib.md5(password.encode()).hexdigest()
         super().__init__(*args, **kwargs)
-    
-    def __set_password(self, pwd):
-        """Encrypts password using MD5"""
-        hash = hashlib.md5()
-        hash.update(pwd.encode('utf-8'))
-        secure_password = hash.hexdigest()
-        setattr(self, "password", secure_password)
