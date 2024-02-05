@@ -143,7 +143,10 @@ def places_search():
 
     if amenities:
         amenity_objects = storage.all('Amenity').values()
-        places = [place for place in places if all(amenity in place.amenities for amenity in amenity_objects)]
+        places = [place for place in places
+                  if all(
+                      amenity in place.amenities for amenity in amenity_objects
+                      )]
 
     confirmed_places = [place.to_dict() for place in places]
     return jsonify(confirmed_places)
