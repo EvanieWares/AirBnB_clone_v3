@@ -89,11 +89,12 @@ def link_place_amenity(place_id, amenity_id):
     if place is None or amenity is None:
         abort(404)
     if STORAGE_TYPE == 'db':
-        place_amenities = place.amenities
+        if amenity in place.amenities:
+            return jsonify(amenity.to_dict()), 200
+        place.amenities.append(amenity)
     else:
-        place_amenities = place.amenity_ids
-    if amenity in place_amenities:
-        return jsonify(amenity.to_dict()), 200
-    place_amenities.append(amenity)
+        if amenity_id in place.amenity_ids:
+            return jsonify(amenity.to_dict()), 200
+        place.amenity_ids.append(amenity_id)
     place.save()
     return jsonify(amenity.to_dict()), 201
